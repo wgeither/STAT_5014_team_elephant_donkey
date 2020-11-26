@@ -1,0 +1,118 @@
+---
+title: "Political Dashboard"
+output: flexdashboard::flex_dashboard
+
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidytext)
+library(twitteR)
+library(tidytext)
+library(dplyr)
+library(ggplot2)
+library(tidytext)
+library(tidyverse)
+library(anytime)
+library(wordcloud)
+library(knitr)
+library(DT)
+library(tidyr)
+library(wordcloud2)
+```
+
+
+```{r prepping_data_for_word_clouds}
+setwd("C:\\Users\\wgeit\\Repos\\STAT_5014_team_elephant_donkey")
+# load data
+trump_df <- readRDS("trump_df_raw.RDS")
+biden_df <- readRDS("biden_df_raw.RDS")
+debate1_df <- readRDS("debate1_df_raw.RDS")
+debate2_df <- readRDS("debate2_df_raw.RDS")
+
+# bring debates together
+debate_df <- rbind(debate1_df, debate2_df)
+
+# tokenize
+tidy_trump_tweets <- trump_df %>% select(created_at, text) %>% unnest_tokens("word", text)
+tidy_biden_tweets <- biden_df %>% select(timestamp, tweet) %>% unnest_tokens("word", tweet)
+tidy_debate <- debate_df %>% select(text) %>% unnest_tokens("word", text)
+
+# take out stop words
+data("stop_words")
+tidy_trump_tweets <- tidy_trump_tweets %>% anti_join(stop_words)
+tidy_biden_tweets <- tidy_biden_tweets %>% anti_join(stop_words)
+tidy_debate <- tidy_debate %>% anti_join(stop_words)
+
+# excludes numbers
+tidy_trump_tweets<-tidy_trump_tweets[-grep("\\b\\d+\\b", tidy_trump_tweets$word),]
+tidy_biden_tweets<-tidy_biden_tweets[-grep("\\b\\d+\\b", tidy_biden_tweets$word),]
+tidy_debate<-tidy_debate[-grep("\\b\\d+\\b", tidy_debate$word),]
+
+# make a list of custom words to exclude
+custom_stop_word <- as.data.frame(c("t.co", "https", "â", "iâ", "itâ", "weâ", "http", "amp", "rt", "ðÿ", "donâ", "ve", "youâ", "thatâ", "00", "theyâ", "heâ", "ll", "didnâ", "doesnâ", "01", "canâ", "thereâ", "whatâ", "hereâ", "10", "arenâ", "15", "35"))
+colnames(custom_stop_word) <- c("word")
+
+# make dataframe
+tidy_debate <- as.data.frame(tidy_debate)
+colnames(tidy_debate) <- c("word")
+
+# take out custom words
+tidy_trump_tweets <- tidy_trump_tweets %>% anti_join(custom_stop_word)
+tidy_biden_tweets <- tidy_biden_tweets %>% anti_join(custom_stop_word)
+tidy_debate <- tidy_debate %>% anti_join(custom_stop_word)
+
+# get trump word count
+trump_cnt <- tidy_trump_tweets %>%
+  count(word) %>%
+    arrange(desc(n))
+
+# get biden word count
+biden_cnt <- tidy_biden_tweets %>%
+  count(word) %>%
+    arrange(desc(n))
+
+# get debate word count
+debate_cnt <- tidy_debate %>%
+  count(word) %>%
+    arrange(desc(n))
+```
+
+Page 1
+===================================== 
+    
+### Trump's Twitter Word Cloud
+    
+```{r}
+# trump word cloud
+wordcloud2(data = trump_cnt, size=1.6, color='red', shape = "circle")
+```
+    
+### Biden's Twitter Word Cloud
+
+```{r}
+# biden word cloud
+wordcloud2(data = biden_cnt, size=1.6, color='skyblue', shape = "circle")
+```
+
+### Debate Word Cloud
+
+```{r}
+# debate word cloud
+wordcloud2(data = debate_cnt, size=1.6, color='random-dark')
+```
+   
+Page 2
+=====================================     
+
+### Chart 1
+    
+```{r}
+
+```
+    
+### Chart 2
+
+```{r}
+```
+```
