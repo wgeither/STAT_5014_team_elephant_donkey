@@ -367,3 +367,449 @@ matlines(df2[,1],df2[,-1],
 title(main="Voters")
 ```
 ```
+
+
+```{r, include=FALSE}
+library(rmapshaper)
+library(tilegramsR)
+library(sp)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(scales)
+
+library(rvest)
+library(selectr)
+library(xml2)
+library(dplyr)
+
+library(ca)
+```
+
+
+# Map Visualization
+
+## 1. 2020 Poll
+
+```{r}
+# Data from https://www.electoral-vote.com/evp2020/Info/data.html
+
+setwd("~/STAT5014_youngjin")
+poll <- read.csv("pres_polls.csv", header = TRUE)
+
+# Dimension of the Poll data
+dim(poll)
+
+# Poll data
+head(poll)
+```
+
+We got poll data from https://www.electoral-vote.com/evp2020/Info/data.html. It has 1025 poll results for each state by different date. In map visualization, we used average poll result for each state, i.e., used average supporting rate for Trump or Biden in each state.
+
+```{r}
+mean_poll <- poll %>%
+  group_by(State) %>%                         
+  summarise_at(vars(Dem, GOP),            
+               list(name = mean))  
+
+mean_poll <- as.data.frame(mean_poll)
+mean_poll[,c(2,3)] <- mean_poll[,c(2,3)]/100
+mean_poll[,4] <- (mean_poll[,2]-mean_poll[,3])/(mean_poll[,2]+mean_poll[,3])
+names(mean_poll)[4] <- "Demo"
+mean_poll[8,1] <- "District of Columbia"
+states <- fread(input = "./us_cities_and_states/states.sql",skip = 23,sep = "'", sep2 = ",", 
+                header = F, select = c(2,4))
+colnames(states) <- c("State", "state")
+
+mean_poll <- left_join(mean_poll,states,by='State')
+names(mean_poll) <- c("State","Demo", "GOP", "Demo-GOP", "state")
+head(mean_poll,10)
+```
+We made average supporting rate for Trump or Biden in each state. For this data, "Demo" is supporting rate for Democratic party and "GOP" means supporting rate for Republican party. "Demo-GOP" means $\frac{Demo-GOP}{Demo+GOP}$. We use "Demo-GOP" for map visualization.
+
+```{r}
+mean_poll_demo <- mean_poll[,c(5,4)]
+poll_2020_map <- sf_Pitch_US_Population_2016_v1
+poll_2020_map <- rmapshaper::ms_dissolve(poll_2020_map, 'state')
+poll_2020_map <- left_join(poll_2020_map,mean_poll_demo,by='state')
+poll_2020_map <- poll_2020_map[,c(1,3,2)]
+colnames(poll_2020_map)[3] <- "poll"
+head(poll_2020_map)
+```
+
+We modified our data with US map information in order to make map visualization.
+
+```{r}
+poll_2020_ggplot <- ggplot(data=poll_2020_map)+
+  geom_sf(aes(fill = poll)) + 
+  geom_sf_label(aes(label = state), size=2.5) + 
+  scale_fill_gradient2(low = muted('firebrick1') , mid = 'white', 
+                       high = muted('deepskyblue1'), midpoint = 0, limits=c(-0.4,0.4)) + 
+  labs(fill = "Demo - GOP") +
+  labs(title="Demo vs GOP : 2020 Poll Average") +
+  theme_minimal()
+
+poll_2020_ggplot
+```
+
+In the map, size of each state represents its population. So the map is different from true map of the USA. For example, California, New York, Texas, and Florida are much bigger in size than their real size in our map. The color represents strength of supporting rate for two parties. The deeper the blue color, the Democratic party is overwhelming. Similarly, the deeper the red color, the Republican party is overwhelming. Colors near white represent that both parties have similar supporting rate, which means states with nearly white colors are swing-states. 
+
+The advantage of this map is that one can see the strength of each parties supporting rate and population size in each state, figuring out which states are important in the election. For example, Texas, Florida, Georgia, North Carolina, and Ohio are nearly white, which means they are swing-states. Also, their sizes are bigger than the other states, which means they have lots of population. So one can conclude that these four states are very important states in the 2020 election. Also, one can see that supporting rates for Democratic party are mostly higher than that of Republican party. Next, we will see the difference between election result and poll result.
+
+## 2. 2020 Election
+
+```{r}
+# Importing 2020 election data
+url <- 'https://www.nbcnews.com/politics/2020-elections/president-results?icid=election_nav'
+webpage <- read_html(url)
+title_html <- html_nodes(webpage, 'tbody') 
+#title_html1 <- html_nodes(webpage, 'tbody') %>% html_children()
+title <- html_text(title_html)
+
+j<-strsplit(title[1], " ")
+j<-unlist(j)
+
+j1<-j[532:541]
+j2<-j1[c(2,3,5,6,10)]
+
+j<-j[-122]
+j[135]<-"North Carolina"
+j<-j[-134]
+j[132]<-'New Jersey'
+j<-j[-131]
+j[146]<-'North Dakota'
+j<-j[-145]
+j<-j[-142]
+j[142]<-'North Carolina'
+j[154]<-'North Dakota'
+j<-j[-153]
+j[178]<-'South Dakota'
+j<-j[-177]
+j[187]<-'South Dakota'
+j<-j[-186]
+j[233]<-'West Virginia'
+j<-j[-232]
+j[242]<-'West Virginia'
+j<-j[-241]
+j[255]<-'New Mexico'
+j[265]<-'New Mexico'
+j[302]<-'DC'
+j[403]<-'New Hampshire'
+j[393]<-'New Hampshire'
+j[406]<-'New York'
+j[416]<-'New York'
+j[496]<-'American Samoa'
+j[500]<-'American Samoa'
+j<-j[-c(254,264,300,301,402,392,405,415,495,499)]
+j[309]<-'DC'
+j<-j[-c(307,308)]
+j<-j[-c(490:509)]
+j<-j[-c(485:488)]
+j<-j[-485]
+j<-j[-c(485:494)]
+j[487]<-'South Carolina'
+j[497]<-'South Carolina'
+j<-j[-c(486,496,499:516)]
+j<-j[-485]
+j[541]<-'Rhode Island'
+j[551]<-'Rhode Island'
+j<-j[-c(540,550)]
+
+q<-{}
+for (i in 0:49)
+{q<-cbind(q,j[2+i*11],j[3+i*11],j[5+i*11],j[6+i*11],j[10+i*11])}
+q<-cbind(q,j2[1],j2[2],j2[3],j2[4],j2[5])
+Matrix<- matrix(unlist(q), ncol = 5, byrow = TRUE)
+
+df<-as.data.frame(Matrix)
+colnames(df)<-c('Biden percent','Biden Counts','Trump percent','Trump Counts','State')
+df2<-df[,c(5,1,2,3,4)]
+head(df2)
+```
+
+We imported 2020 election data. Now we do the same job as we did for the poll data.
+
+
+```{r}
+vote_2020_data <- df2[,c(1,3,5)]
+
+vote_2020_data[,2] <- as.numeric(gsub(",","",vote_2020_data[,2]))
+vote_2020_data[,3] <- as.numeric(gsub(",","",vote_2020_data[,3]))
+
+vote_2020_data[,4] <- (vote_2020_data[,2]-vote_2020_data[,3])/(vote_2020_data[,2]+vote_2020_data[,3])
+vote_2020_data <- vote_2020_data[,c(1,4)] 
+
+vote_2020_data <- left_join(vote_2020_data,states,by='State')
+vote_2020_data[28,3] <- vote_2020_data[28,1]
+vote_2020_data <- vote_2020_data[,c(3,2)]
+names(vote_2020_data)[2] <- "demo"
+
+vote_2020_map <- sf_Pitch_US_Population_2016_v1
+vote_2020_map <- rmapshaper::ms_dissolve(vote_2020_map, 'state')
+vote_2020_map <- left_join(vote_2020_map,vote_2020_data,by='state')
+vote_2020_map <- vote_2020_map[,c(1,3,2)]
+colnames(vote_2020_map)[3] <- "election"
+
+vote_2020_ggplot <- ggplot(data=vote_2020_map)+
+  geom_sf(aes(fill = election)) + 
+  geom_sf_label(aes(label = state), size=2.5) + 
+  scale_fill_gradient2(low = muted('firebrick1') , mid = 'white', 
+                       high = muted('deepskyblue1'), midpoint = 0, limits=c(-0.4,0.4)) + 
+  labs(fill = "Demo - GOP") +
+  labs(title="Demo vs GOP : 2020 Election") +
+  theme_minimal()
+vote_2020_ggplot
+```
+
+The election result is quite different from the poll result. Although Biden won the election, overall, Republican party got more vote than expected by the poll result. Especially, In Florida, the vote result is entirely differnt from the poll result : Trump won in the Florida. We now compare poll result and election result for 2020 in one map.
+
+## 3. 2020 : Poll vs Election
+```{r}
+# Poll 2020 vs Vote 2020
+mean_poll_demo_2 <- mean_poll_demo %>% arrange(desc(state))
+vote_2020_data_2 <- vote_2020_data %>% arrange(desc(state))
+poll_vote_data <- mean_poll_demo_2
+poll_vote_data[,2] <- vote_2020_data_2[,2]-mean_poll_demo_2[,2]
+head(poll_vote_data)
+```
+
+We calculated the difference between election result and mean poll result. Now we will make a map with it. In the data, one can see that Biden got less vote than expected in the polls.
+
+```{r}
+
+vote_poll_comp_2020_map <- sf_Pitch_US_Population_2016_v1
+vote_poll_comp_2020_map <- rmapshaper::ms_dissolve(vote_poll_comp_2020_map, 'state')
+vote_poll_comp_2020_map <- left_join(vote_poll_comp_2020_map,poll_vote_data,by='state')
+vote_poll_comp_2020_map <- vote_poll_comp_2020_map[,c(1,3,2)]
+colnames(vote_poll_comp_2020_map)[3] <- "difference"
+
+poll_vote_2020 <- ggplot(data=vote_poll_comp_2020_map)+
+  geom_sf(aes(fill = difference)) + 
+  geom_sf_label(aes(label = state), size=2.5) + 
+  scale_fill_gradient2(low = muted('firebrick1') , mid = 'white', 
+                       high = muted('deepskyblue1'), midpoint = 0, limits=c(-0.4,0.4)) + 
+  labs(fill = "Election-Poll") +
+  labs(title="2020 : Election(Demo-GOP) vs Poll(Demo-GOP)") +
+  theme_minimal()
+
+poll_vote_2020
+```
+
+Above map is the comparing poll result and election result in 2020. Overall, although Trump lost the election, he got much more vote in almost all states than polls expected. This means that many people are not willing to be honest in the poll. Now we will compare the election result for 2016 and 2020. 
+
+
+## 4. 2016 Election
+
+```{r}
+# vote 2016
+
+url <- 'https://www.politico.com/2016-election/results/map/president/'
+webpage <- read_html(url)
+title_html <- html_nodes(webpage, 'tbody') 
+title <- html_text(title_html)
+
+j<-strsplit(title, "\n")
+
+list<-{}
+for (i in 1:51)
+{k<-unlist(j[i])
+k<-k[k != ""]
+k<-k[k != " "]
+for (q in 1:8)
+{if ((k[q]=="R Winner D. Trump")|(k[q]=="D Winner H. Clinton")|(k[q]=="D H. Clinton")|(k[q]=="R D. Trump"))
+{list<-cbind(list,k[q],k[q+1],k[q+2])}
+}
+}
+
+Matrix<- matrix(unlist(list), ncol = 6, byrow = TRUE)
+dat<-as.data.frame(Matrix)
+
+for (i in (1:51))
+{if (dat[i,1]=="D Winner H. Clinton")
+{a<-dat[i,4]
+b<-dat[i,5]
+c<-dat[i,6]
+d<-dat[i,1]
+e<-dat[i,2]
+f<-dat[i,3]
+dat[i,1]<-a
+dat[i,2]<-b
+dat[i,3]<-c
+dat[i,4]<-d
+dat[i,5]<-e
+dat[i,6]<-f}
+}
+
+library(downloader)
+download("http://www.farinspace.com/wp-content/uploads/us_cities_and_states.zip",dest="us_cities_states.zip")
+unzip("us_cities_states.zip", exdir="/STAT5014_youngjin")
+library(data.table)
+states <- fread(input = "./us_cities_and_states/states.sql",skip = 23,sep = "'", sep2 = ",", header = F, select = c(2,4))
+colnames(states)<-c("States","states")
+a<-order(states$States)
+State<-data.frame(State=character())
+for (i in 1:51)
+{State[i,]<-states[a[i],1]}
+
+dat<-cbind(State,dat)
+
+df3<-dat[,c(1,6,7,3,4)]
+colnames(df3)<-cbind('State','HillaryPercent','HillaryCounts','TrumpPercent','TrumpCounts')
+
+df3[,3]<-as.numeric(gsub(",", "", df3[,3]))
+df3[,5]<-as.numeric(gsub(",", "", df3[,5]))
+df3[,2]<-as.numeric(sub("%","",df3[,2]))/100
+df3[,4]<-as.numeric(sub("%","",df3[,4]))/100
+
+head(df3)
+```
+
+We imported 2016 election result. Now we will make map from it as we did before.
+
+```{r}
+vote_2016_data <- df3[,c(1,3,5)]
+
+vote_2016_data[,2] <- as.numeric(gsub(",","",vote_2016_data[,2]))
+vote_2016_data[,3] <- as.numeric(gsub(",","",vote_2016_data[,3]))
+
+vote_2016_data[,4] <- (vote_2016_data[,2]-vote_2016_data[,3])/(vote_2016_data[,2]+vote_2016_data[,3])
+vote_2016_data <- vote_2016_data[,c(1,4)] 
+colnames(vote_2016_data)[1]="State"
+
+states <- fread(input = "./us_cities_and_states/states.sql",skip = 23,sep = "'", sep2 = ",", 
+                header = F, select = c(2,4))
+colnames(states) <- c("State", "state")
+
+vote_2016_data <- left_join(vote_2016_data,states,by='State')
+vote_2016_data[28,3] <- vote_2016_data[28,1]
+vote_2016_data <- vote_2016_data[,c(3,2)]
+vote_2016_data[28,1] <- "NE"
+names(vote_2016_data)[2] <- "demo"
+
+vote_2016_map <- sf_Pitch_US_Population_2016_v1
+vote_2016_map <- rmapshaper::ms_dissolve(vote_2016_map, 'state')
+vote_2016_map <- left_join(vote_2016_map,vote_2016_data,by='state')
+vote_2016_map <- vote_2016_map[,c(1,3,2)]
+colnames(vote_2016_map)[3] <- "election"
+
+vote_2016_ggplot <- ggplot(data=vote_2016_map)+
+  geom_sf(aes(fill = election)) + 
+  geom_sf_label(aes(label = state), size=2.5) + 
+  scale_fill_gradient2(low = muted('firebrick1') , mid = 'white', 
+                       high = muted('deepskyblue1'), midpoint = 0, limits=c(-0.4,0.4)) + 
+  labs(fill = "Demo - GOP") +
+  labs(title="Demo vs GOP : 2016 Election") +
+  theme_minimal()
+
+vote_2016_ggplot
+```
+
+Note that Dark color in West Virginia is due to its extraordinary high supporting rate for Trump. One can see that Trump lost his support from many states in 2020 comparing to 2016. Now we compare election result for 2020 and 2016 in one map.
+
+## 5. Election : 2020 vs 2016
+
+```{r}
+# Poll 2020 vs Vote 2016
+vote_2020_data_2 <- vote_2020_data %>% arrange(desc(state))
+vote_2016_data_2 <- vote_2016_data %>% arrange(desc(state))
+vote_comp_data <- poll_vote_data
+vote_comp_data[,2] <- vote_2020_data_2[,2]-vote_2016_data_2[,2]
+head(vote_comp_data)
+```
+
+We calculated the difference between election result in 2020 and that in 2016. One can see that Democratic party gianed more vote in 2020 than 2016.
+
+```{r}
+vote_comp_data_map <- sf_Pitch_US_Population_2016_v1
+vote_comp_data_map <- rmapshaper::ms_dissolve(vote_comp_data_map, 'state')
+vote_comp_data_map <- left_join(vote_comp_data_map,vote_comp_data,by='state')
+vote_comp_data_map <- vote_comp_data_map[,c(1,3,2)]
+colnames(vote_comp_data_map)[3] <- "difference"
+
+vote_comp_ggplot <- ggplot(data=vote_comp_data_map)+
+  geom_sf(aes(fill = difference)) + 
+  geom_sf_label(aes(label = state), size=2.5) + 
+  scale_fill_gradient2(low = muted('firebrick1') , mid = 'white', 
+                       high = muted('deepskyblue1'), midpoint = 0, limits=c(-0.4,0.4)) + 
+  labs(fill = "2020-2016") +
+  labs(title=" Election : 2020(Demo-GOP) vs 2016(Demo-GOP)") +
+  theme_minimal()
+
+vote_comp_ggplot
+```
+
+One can see that in most states, Democratic party gained more vote in 2020 than 2016.
+
+# Correspondence analysis for Poll by Demographics
+
+Now we use correspondance analysis for poll by demographics. Correspondence analysis is an effective multivariate analysis method to visualize $I \times J$ contingency table. We got our poll by demographics data from https://www.pewresearch.org/politics/2020/10/09/the-trump-biden-presidential-contest/.
+
+```{r}
+## Data source
+# https://docs.google.com/spreadsheets/d/1cZURJuAP8P5rwmIRqX1Qk2QjXRHN4SeRbd-s51LbxH4/edit#gid=0
+
+# Correspondence Analysis
+
+demo <- read.csv("Demo_data.csv", header = TRUE)
+rownames(demo) <- demo$category
+demo <- demo[,-1]
+demo[,4] <- 100-(demo[,2]+demo[,3])
+names(demo)[4] <- "others"
+head(demo)
+```
+
+One can see that there are three categories : Trump or Lean Trump, Biden or Lean Biden, and Others. We will do correspondence analysis with this data. 
+
+```{r}
+fit_1 <- ca(demo[demo$tablelist=="racegender",-1])
+fit_2 <- ca(demo[demo$tablelist=="party",-1])
+fit_3 <- ca(demo[demo$tablelist=="marrrygender",-1])
+fit_4 <- ca(demo[demo$tablelist=="age",-1])
+fit_5 <- ca(demo[demo$tablelist=="regiongender",-1])
+fit_6 <- ca(demo[demo$tablelist=="Education",-1])
+
+```
+
+In correspondence analysis, Dimension 1 is the dominant dimension. If Dimension 1 is much more dominant than Dimension 2, which is our data, one can say that when $i$th row is $j$th column is close in Dimension 1, they occur together very much.
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_1, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Above correspondence analysis is for race & gender vs supporting candidate. One can see that White people are more likely to support Trump but the other races are more likely to support Biden. Also, Womens are more likely to support Biden than men but it is less important than race factor.
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_2, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Above correspondence analysis is for supporting party vs supporting candidate. One can see that republicans are more likely to support Trump and Democratics are more likely to support Biden. Also, moderate people are less supportive for candidate in their party.
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_3, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Above correspondence analysis is for marriage & geneder vs supporting candidate. One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than geneder for choosing supporting candidnate.
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_4, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Above correspondence analysis is for age vs supporting candidate. As people gets older, they are more likely to support Trump. But young people (18-29) have little bit more tendency to choose no candidates comparing the other age groups. 
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_5, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE))
+```
+
+Above correspondence analysis is for region & gender vs supporting candidate. One can see that people living in more urban area are more likely to support Biden. Also, Women are more likely to support Biden. Region is more dominant than geneder for choosing supporting candidnate. 
+
+```{r, fig.height=3.7, echo=FALSE}
+plot(fit_6, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE), ylim=c(-0.05,0.05))
+```
+
+Above correspondence analysis is for education level vs supporting candidate. One can see that as education level gets higher, people are more likely to support Biden. Especially, people with postgrad education are much more likely to support Biden.
