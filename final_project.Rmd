@@ -111,8 +111,92 @@ Page 2
 
 ```
     
-### Chart 2
+### Trump's supporting rate over time
 
 ```{r}
+df<-read.csv('fivethirtyeight.csv', header = TRUE, sep = ",")
+df
+Adults<-df[df$subgroup == 'Adults', ]
+Allpolls<-df[df$subgroup == 'All polls', ]
+Voters<-df[df$subgroup == 'Voters', ]
+par(mfrow=c(2,3))
+
+Adults$date<-as.Date(Adults$date)
+df2 <- data.frame(Day=Adults$date,
+                    ApprovePercet=Adults$approve_estimate,lwr=Adults$approve_lo,upr=Adults$approve_hi)
+plot(ApprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "pink", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("red","pink",'pink'),
+        )
+title(main="Adults")
+
+Allpolls$date<-as.Date(Allpolls$date)
+df2 <- data.frame(Day=Allpolls$date,
+                    ApprovePercet=Allpolls$approve_estimate,lwr=Allpolls$approve_lo,upr=Allpolls$approve_hi)
+plot(ApprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "pink", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("red","pink",'pink'),
+        )
+title(main="All polls")
+
+Voters$date<-as.Date(Voters$date)
+df2 <- data.frame(Day=Voters$date,
+                    ApprovePercet=Voters$approve_estimate,lwr=Voters$approve_lo,upr=Voters$approve_hi)
+plot(ApprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "pink", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("red","pink",'pink'),
+        )
+title(main="Voters")
+
+Adults$date<-as.Date(Adults$date)
+df2 <- data.frame(Day=Adults$date,
+                    DisapprovePercet=Adults$disapprove_estimate,lwr=Adults$disapprove_lo,upr=Adults$disapprove_hi)
+plot(DisapprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "cadetblue1", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("blue","cadetblue1",'cadetblue1'),
+        )
+title(main="Adults")
+
+Allpolls$date<-as.Date(Allpolls$date)
+df2 <- data.frame(Day=Allpolls$date,
+                    DisapprovePercet=Allpolls$disapprove_estimate,lwr=Allpolls$disapprove_lo,upr=Allpolls$disapprove_hi)
+plot(DisapprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "cadetblue1", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("blue","cadetblue1",'cadetblue1'),
+        )
+title(main="All polls")
+
+Voters$date<-as.Date(Voters$date)
+df2 <- data.frame(Day=Voters$date,
+                    DisapprovePercet=Voters$disapprove_estimate,lwr=Voters$disapprove_lo,upr=Voters$disapprove_hi)
+plot(DisapprovePercet~Day,data=df2,ylim=range(c(df2$lwr,df2$upr)))
+ #make polygon where coordinates start with lower limit and then upper limit in reverse order
+with(df2,polygon(c(Day,rev(Day)),c(lwr,rev(upr)),col = "cadetblue1", border = FALSE))
+matlines(df2[,1],df2[,-1],
+          lwd=c(2,1,1),
+          lty=1,
+          col=c("blue","cadetblue1",'cadetblue1'),
+        )
+title(main="Voters")
 ```
 ```
