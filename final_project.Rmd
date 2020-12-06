@@ -115,7 +115,6 @@ Page 2
 
 ```{r}
 df<-readRDS(trumpsuprte.rds)
-df
 Adults<-df[df$subgroup == 'Adults', ]
 Allpolls<-df[df$subgroup == 'All polls', ]
 Voters<-df[df$subgroup == 'Voters', ]
