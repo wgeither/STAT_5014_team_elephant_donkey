@@ -26,15 +26,7 @@ library(downloader)
 library(ca)
 ```
 
-Intro
-=====================================
 
-```{r}
-library(png)
-pp <- readPNG("pic4.png")
-plot.new() 
-rasterImage(pp,0,0,1,1)
-```
 
 WordClouds
 =====================================
@@ -115,6 +107,16 @@ wordcloud2(data = debate_cnt, size=1.6, color='random-dark')
 ```{r}
 # biden word cloud
 wordcloud2(data = biden_cnt, size=1.6, color='skyblue', shape = "circle")
+```
+
+Intro
+=====================================
+
+```{r}
+library(png)
+pp <- readPNG("pic4.png")
+plot.new() 
+rasterImage(pp,0,0,1,1)
 ```
 
 Trump's Support Rate
