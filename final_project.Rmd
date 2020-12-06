@@ -369,24 +369,6 @@ title(main="Voters")
 ```
 
 
-```{r, include=FALSE}
-library(rmapshaper)
-library(tilegramsR)
-library(sp)
-library(dplyr)
-library(ggplot2)
-library(data.table)
-library(scales)
-
-library(rvest)
-library(selectr)
-library(xml2)
-library(dplyr)
-
-library(ca)
-```
-
-
 # Map Visualization
 
 ## 1. 2020 Poll
@@ -394,7 +376,7 @@ library(ca)
 ```{r}
 # Data from https://www.electoral-vote.com/evp2020/Info/data.html
 
-poll <- read.csv("pres_polls.csv", header = TRUE)
+poll <- readRDS("pres_polls.rds")
 
 # Dimension of the Poll data
 dim(poll)
@@ -406,6 +388,7 @@ head(poll)
 We got poll data from https://www.electoral-vote.com/evp2020/Info/data.html. It has 1025 poll results for each state by different date. In map visualization, we used average poll result for each state, i.e., used average supporting rate for Trump or Biden in each state.
 
 ```{r}
+# average poll data by states
 mean_poll <- poll %>%
   group_by(State) %>%                         
   summarise_at(vars(Dem, GOP),            
@@ -416,10 +399,11 @@ mean_poll[,c(2,3)] <- mean_poll[,c(2,3)]/100
 mean_poll[,4] <- (mean_poll[,2]-mean_poll[,3])/(mean_poll[,2]+mean_poll[,3])
 names(mean_poll)[4] <- "Demo"
 mean_poll[8,1] <- "District of Columbia"
-states <- fread(input = "./us_cities_and_states/states.sql",skip = 23,sep = "'", sep2 = ",", 
+states <- fread(input = "states.sql",skip = 23,sep = "'", sep2 = ",", 
                 header = F, select = c(2,4))
 colnames(states) <- c("State", "state")
 
+# join with states data for matching
 mean_poll <- left_join(mean_poll,states,by='State')
 names(mean_poll) <- c("State","Demo", "GOP", "Demo-GOP", "state")
 head(mean_poll,10)
@@ -427,6 +411,7 @@ head(mean_poll,10)
 We made average supporting rate for Trump or Biden in each state. For this data, "Demo" is supporting rate for Democratic party and "GOP" means supporting rate for Republican party. "Demo-GOP" means $\frac{Demo-GOP}{Demo+GOP}$. We use "Demo-GOP" for map visualization.
 
 ```{r}
+# Adding map information to the poll data
 mean_poll_demo <- mean_poll[,c(5,4)]
 poll_2020_map <- sf_Pitch_US_Population_2016_v1
 poll_2020_map <- rmapshaper::ms_dissolve(poll_2020_map, 'state')
@@ -439,6 +424,7 @@ head(poll_2020_map)
 We modified our data with US map information in order to make map visualization.
 
 ```{r}
+# GGplot
 poll_2020_ggplot <- ggplot(data=poll_2020_map)+
   geom_sf(aes(fill = poll)) + 
   geom_sf_label(aes(label = state), size=2.5) + 
@@ -543,12 +529,14 @@ vote_2020_data[28,3] <- vote_2020_data[28,1]
 vote_2020_data <- vote_2020_data[,c(3,2)]
 names(vote_2020_data)[2] <- "demo"
 
+# Adding map information to the election data
 vote_2020_map <- sf_Pitch_US_Population_2016_v1
 vote_2020_map <- rmapshaper::ms_dissolve(vote_2020_map, 'state')
 vote_2020_map <- left_join(vote_2020_map,vote_2020_data,by='state')
 vote_2020_map <- vote_2020_map[,c(1,3,2)]
 colnames(vote_2020_map)[3] <- "election"
 
+# GGplot
 vote_2020_ggplot <- ggplot(data=vote_2020_map)+
   geom_sf(aes(fill = election)) + 
   geom_sf_label(aes(label = state), size=2.5) + 
@@ -575,13 +563,14 @@ head(poll_vote_data)
 We calculated the difference between election result and mean poll result. Now we will make a map with it. In the data, one can see that Biden got less vote than expected in the polls.
 
 ```{r}
-
+# Adding map information to the poll vs election data
 vote_poll_comp_2020_map <- sf_Pitch_US_Population_2016_v1
 vote_poll_comp_2020_map <- rmapshaper::ms_dissolve(vote_poll_comp_2020_map, 'state')
 vote_poll_comp_2020_map <- left_join(vote_poll_comp_2020_map,poll_vote_data,by='state')
 vote_poll_comp_2020_map <- vote_poll_comp_2020_map[,c(1,3,2)]
 colnames(vote_poll_comp_2020_map)[3] <- "difference"
 
+# GGplot
 poll_vote_2020 <- ggplot(data=vote_poll_comp_2020_map)+
   geom_sf(aes(fill = difference)) + 
   geom_sf_label(aes(label = state), size=2.5) + 
@@ -685,12 +674,14 @@ vote_2016_data <- vote_2016_data[,c(3,2)]
 vote_2016_data[28,1] <- "NE"
 names(vote_2016_data)[2] <- "demo"
 
+# Adding map information to the election data
 vote_2016_map <- sf_Pitch_US_Population_2016_v1
 vote_2016_map <- rmapshaper::ms_dissolve(vote_2016_map, 'state')
 vote_2016_map <- left_join(vote_2016_map,vote_2016_data,by='state')
 vote_2016_map <- vote_2016_map[,c(1,3,2)]
 colnames(vote_2016_map)[3] <- "election"
 
+# GGplot
 vote_2016_ggplot <- ggplot(data=vote_2016_map)+
   geom_sf(aes(fill = election)) + 
   geom_sf_label(aes(label = state), size=2.5) + 
@@ -719,12 +710,14 @@ head(vote_comp_data)
 We calculated the difference between election result in 2020 and that in 2016. One can see that Democratic party gianed more vote in 2020 than 2016.
 
 ```{r}
+# Adding map information to the election data
 vote_comp_data_map <- sf_Pitch_US_Population_2016_v1
 vote_comp_data_map <- rmapshaper::ms_dissolve(vote_comp_data_map, 'state')
 vote_comp_data_map <- left_join(vote_comp_data_map,vote_comp_data,by='state')
 vote_comp_data_map <- vote_comp_data_map[,c(1,3,2)]
 colnames(vote_comp_data_map)[3] <- "difference"
 
+# GGplot
 vote_comp_ggplot <- ggplot(data=vote_comp_data_map)+
   geom_sf(aes(fill = difference)) + 
   geom_sf_label(aes(label = state), size=2.5) + 
@@ -749,7 +742,7 @@ Now we use correspondance analysis for poll by demographics. Correspondence anal
 
 # Correspondence Analysis
 
-demo <- read.csv("Demo_data.csv", header = TRUE)
+demo <- readRDS("Demo_data.rds")
 rownames(demo) <- demo$category
 demo <- demo[,-1]
 demo[,4] <- 100-(demo[,2]+demo[,3])
