@@ -1,0 +1,43 @@
+category,tablelist,Trump/Lean Trump,Biden/Lean Biden
+White men,racegender,53,41
+White women,racegender,49,46
+Black men,racegender,11,88
+Black women,racegender,6,91
+Hispanic men,racegender,35,59
+Hispanic women,racegender,23,67
+Conservative Rep/Lean,party,94,4
+Moderate/Liberal Rep/Lean,party,67,21
+Moderate/Conservative Dem/Lean,party,5,90
+Liberal Dem/Lean,party,0,97
+Married men,marrrygender,51,44
+Married women,marrrygender,48,48
+Unmarried men,marrrygender,37,56
+Unmarried women,marrrygender,29,64
+18-29,age,29,59
+30-49,age,38,55
+50-64,age,47,49
+65+,age,49,49
+Urban men,regiongender,29,67
+Suburban men,regiongender,44,49
+Rural men,regiongender,62,31
+Urban women,regiongender,21,73
+Suburban women,regiongender,38,57
+Rural women,regiongender,56,39
+WEP,religion,78,17
+WPNE,religion,53,43
+BP,religion,9,90
+WNHC,religion,52,44
+HC,religion,26,67
+Jewish,religion,27,70
+NET Unaffiliated,religion,22,71
+Atheist,religion,7,88
+Agnostic,religion,15,79
+Nothing in particular,religion,31,62
+Postgrad,Education,28,68
+4-year college,Education,37,57
+Some college,Education,46,48
+HS or less,Education,49,45
+$20k <,Money,31,61
+$20k-$50k,Money,42,52
+$50k-$100k,Money,46,49
+$100k >,Money,41,55
