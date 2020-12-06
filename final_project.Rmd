@@ -281,7 +281,7 @@ df2
 ### Trump's supporting rate over time
 
 ```{r}
-df<-read.csv('fivethirtyeight.csv', header = TRUE, sep = ",")
+df<-readRDS(trumpsuprte.rds)
 df
 Adults<-df[df$subgroup == 'Adults', ]
 Allpolls<-df[df$subgroup == 'All polls', ]
