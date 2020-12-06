@@ -394,7 +394,6 @@ library(ca)
 ```{r}
 # Data from https://www.electoral-vote.com/evp2020/Info/data.html
 
-setwd("~/STAT5014_youngjin")
 poll <- read.csv("pres_polls.csv", header = TRUE)
 
 # Dimension of the Poll data
@@ -642,7 +641,7 @@ dat[i,6]<-f}
 
 library(downloader)
 download("http://www.farinspace.com/wp-content/uploads/us_cities_and_states.zip",dest="us_cities_states.zip")
-unzip("us_cities_states.zip", exdir="/STAT5014_youngjin")
+unzip("us_cities_states.zip", exdir="./")
 library(data.table)
 states <- fread(input = "./us_cities_and_states/states.sql",skip = 23,sep = "'", sep2 = ",", header = F, select = c(2,4))
 colnames(states)<-c("States","states")
