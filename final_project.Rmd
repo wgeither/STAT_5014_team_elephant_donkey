@@ -581,7 +581,7 @@ names(demo)[4] <- "others"
 ```
 
 
-### Chart 1
+### Race & Gender vs. Canidate
 ```{r}
 fit_1 <- CA(demo[demo$tablelist=="racegender",-1])
 ```
@@ -591,9 +591,9 @@ fit_1 <- CA(demo[demo$tablelist=="racegender",-1])
 Now we use correspondance analysis for poll by demographics. Correspondence analysis is an effective multivariate analysis method to visualize $I \times J$ contingency table. We got our poll by demographics data from https://www.pewresearch.org/politics/2020/10/09/the-trump-biden-presidential-contest/.
 One can see that there are three categories : Trump or Lean Trump, Biden or Lean Biden, and Others. We will do correspondence analysis with this data. 
 In correspondence analysis, Dimension 1 is the dominant dimension. If Dimension 1 is much more dominant than Dimension 2, which is our data, one can say that when $i$th row is $j$th column is close in Dimension 1, they occur together very much.
-Above correspondence analysis is for race & gender vs supporting candidate. One can see that White people are more likely to support Trump but the other races are more likely to support Biden. Also, Womens are more likely to support Biden than men but it is less important than race factor.
+This correspondence analysis is for race & gender vs supporting candidate. One can see that White people are more likely to support Trump but the other races are more likely to support Biden. Also, Womens are more likely to support Biden than men but it is less important than race factor.
 
-### Chart 2
+### Party vs. Canidate
 ```{r}
 fit_2 <- CA(demo[demo$tablelist=="party",-1])
 ```
@@ -602,16 +602,16 @@ fit_2 <- CA(demo[demo$tablelist=="party",-1])
 
 Supporting party vs supporting candidate: One can see that republicans are more likely to support Trump and Democratics are more likely to support Biden. Also, moderate people are less supportive for candidate in their party.
 
-### Chart 3
+### Marriage & gender vs. Canidate
 ```{r}
 fit_3 <- CA(demo[demo$tablelist=="marrrygender",-1])
 ```
 
 ***
 
-Marriage & geneder vs supporting candidate: One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than geneder for choosing supporting candidnate.
+Marriage & gender vs supporting candidate: One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than gender for choosing supporting candidate.
 
-### Chart 4
+### Age vs. Canidate
 ```{r}
 fit_4 <- CA(demo[demo$tablelist=="age",-1])
 ```
@@ -620,7 +620,7 @@ fit_4 <- CA(demo[demo$tablelist=="age",-1])
 
 Age vs supporting candidate: As people gets older, they are more likely to support Trump. But young people (18-29) have little bit more tendency to choose no candidates comparing the other age groups. 
 
-### Chart 5
+### Region & gender vs. Canidate
 ```{r}
 fit_5 <- CA(demo[demo$tablelist=="regiongender",-1])
 ```
@@ -629,7 +629,7 @@ fit_5 <- CA(demo[demo$tablelist=="regiongender",-1])
 
 Region & gender vs supporting candidate: One can see that people living in more urban area are more likely to support Biden. Also, Women are more likely to support Biden. Region is more dominant than geneder for choosing supporting candidnate. 
 
-### Chart 6
+### Education level vs. Canidate
 ```{r}
 fit_6 <- CA(demo[demo$tablelist=="Education",-1])
 ```
@@ -638,7 +638,7 @@ fit_6 <- CA(demo[demo$tablelist=="Education",-1])
 
 Education level vs supporting candidate: One can see that as education level gets higher, people are more likely to support Biden. Especially, people with postgrad education are much more likely to support Biden.
 
-### Chart 7
+### Income vs. Canidate
 ```{r}
 fit_7 <- CA(demo[demo$tablelist=="Money",-1])
 ```
@@ -647,7 +647,7 @@ fit_7 <- CA(demo[demo$tablelist=="Money",-1])
 
 Income vs supporting candidate:
 
-### Chart 8
+### Religion vs. Canidate
 ```{r}
 fit_8 <- CA(demo[demo$tablelist=="religion",-1])
 ```
