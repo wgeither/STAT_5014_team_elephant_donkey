@@ -24,6 +24,8 @@ library(scales)
 library(data.table)
 library(downloader)
 library(ca)
+library(FactoMineR)
+library(factoextra)
 ```
 
 
@@ -608,13 +610,6 @@ demo[,4] <- 100-(demo[,2]+demo[,3])
 names(demo)[4] <- "others"
 #head(demo)
 ```
-```{r}
-install.packages("FactoMineR")
-install.packages("factoextra")
-
-library("FactoMineR")
-library("factoextra")
-```
 
 
 ### Chart 1
@@ -636,7 +631,7 @@ fit_2 <- CA(demo[demo$tablelist=="party",-1])
 
 ***
 
-Above correspondence analysis is for supporting party vs supporting candidate. One can see that republicans are more likely to support Trump and Democratics are more likely to support Biden. Also, moderate people are less supportive for candidate in their party.
+Supporting party vs supporting candidate: One can see that republicans are more likely to support Trump and Democratics are more likely to support Biden. Also, moderate people are less supportive for candidate in their party.
 
 ### Chart 3
 ```{r}
@@ -645,7 +640,7 @@ fit_3 <- CA(demo[demo$tablelist=="marrrygender",-1])
 
 ***
 
-Above correspondence analysis is for marriage & geneder vs supporting candidate. One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than geneder for choosing supporting candidnate.
+Marriage & geneder vs supporting candidate: One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than geneder for choosing supporting candidnate.
 
 ### Chart 4
 ```{r}
@@ -654,7 +649,7 @@ fit_4 <- CA(demo[demo$tablelist=="age",-1])
 
 ***
 
-Above correspondence analysis is for age vs supporting candidate. As people gets older, they are more likely to support Trump. But young people (18-29) have little bit more tendency to choose no candidates comparing the other age groups. 
+Age vs supporting candidate: As people gets older, they are more likely to support Trump. But young people (18-29) have little bit more tendency to choose no candidates comparing the other age groups. 
 
 ### Chart 5
 ```{r}
@@ -663,7 +658,7 @@ fit_5 <- CA(demo[demo$tablelist=="regiongender",-1])
 
 ***
 
-Above correspondence analysis is for region & gender vs supporting candidate. One can see that people living in more urban area are more likely to support Biden. Also, Women are more likely to support Biden. Region is more dominant than geneder for choosing supporting candidnate. 
+Region & gender vs supporting candidate: One can see that people living in more urban area are more likely to support Biden. Also, Women are more likely to support Biden. Region is more dominant than geneder for choosing supporting candidnate. 
 
 ### Chart 6
 ```{r}
@@ -672,7 +667,7 @@ fit_6 <- CA(demo[demo$tablelist=="Education",-1])
 
 ***
 
-Above correspondence analysis is for education level vs supporting candidate. One can see that as education level gets higher, people are more likely to support Biden. Especially, people with postgrad education are much more likely to support Biden.
+Education level vs supporting candidate: One can see that as education level gets higher, people are more likely to support Biden. Especially, people with postgrad education are much more likely to support Biden.
 
 ### Chart 7
 ```{r}
@@ -681,7 +676,7 @@ fit_7 <- CA(demo[demo$tablelist=="Money",-1])
 
 ***
 
-Above correspondence analysis is for income vs supporting candidate.
+Income vs supporting candidate:
 
 ### Chart 8
 ```{r}
@@ -690,4 +685,4 @@ fit_8 <- CA(demo[demo$tablelist=="religion",-1])
 
 ***
 
-Above correspondence analysis is for religion vs supporting candidate.
+Religion vs supporting candidate:
