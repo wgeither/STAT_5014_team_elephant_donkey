@@ -124,7 +124,11 @@ rasterImage(pp,0,0,1,1)
 Trump's Support Rate
 =====================================     
     
-ADD COMMENTARY HERE
+Comparisons between different approval-ratings polls aren’t always apples to apples. Some polls are surveying adults regardless of their voting status; others are polling registered voters. So three pairs of graphs were created with respect to "All polls", "Adults" and Voters. 
+
+As we can see the general trends of the three categories of people are similar. 2017 is the "jumping down year" for Trump. Maybe many people who selected him got disappointed. But the approving rate went back (though not as high as when he got elected) and didn't fluctuate a lot during the years (but never surpassed 50%). In the beginning of 2020 it even reached a little peak, but soon got beaten down (Maybe by Covid?). However, even with Covid, his approving rate didn't fall as below as 2017. Is possible that some people who were first disappointed by him later realized that he was "the best among the worst"? 
+
+Also note that Trump won 46.9% of total votes in 2020. This rate is a bit higher than what is estimated in here. This implies a slight bias of the surveys. Maybe some Trump supporters would really lie. As Andrew Yang said, "We are not gonna beat Trump. We are gonna beat the problems that got Trump elected." As the data predict, Trump's supporting rate has a tendency of going up in the future. There are many problems for Biden to solve.
 
 ### Trump's supporting rate over time
 
@@ -139,19 +143,19 @@ Voters <- df[df$subgroup == 'Voters', ]
 
 
 ##ggplot
-Adults$date<-as.Date(Adults$date)
-df2 <- data.frame(Day=Adults$date,
-                    ApprovePercet=Adults$approve_estimate,lwr=Adults$approve_lo,upr=Adults$approve_hi)
-p1 <- ggplot(df2, aes(Day, ApprovePercet))+ggtitle("Adults")+ 
-  theme(plot.title = element_text(hjust = 0.5))+
-    geom_line(data=df2,color="red")+
-    geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="pink",fill = "pink",alpha=0.8)
-
-
 Allpolls$date<-as.Date(Allpolls$date)
 df2 <- data.frame(Day=Allpolls$date,
                     ApprovePercet=Allpolls$approve_estimate,lwr=Allpolls$approve_lo,upr=Allpolls$approve_hi)
 p2 <- ggplot(df2, aes(Day, ApprovePercet))+ggtitle("Allpolls")+ 
+  theme(plot.title = element_text(hjust = 0.5))+
+    geom_line(data=df2,color="red")+
+    geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="pink",fill = "pink",alpha=0.8)
+    
+    
+Adults$date<-as.Date(Adults$date)
+df2 <- data.frame(Day=Adults$date,
+                    ApprovePercet=Adults$approve_estimate,lwr=Adults$approve_lo,upr=Adults$approve_hi)
+p1 <- ggplot(df2, aes(Day, ApprovePercet))+ggtitle("Adults")+ 
   theme(plot.title = element_text(hjust = 0.5))+
     geom_line(data=df2,color="red")+
     geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="pink",fill = "pink",alpha=0.8)
@@ -164,21 +168,22 @@ p3 <- ggplot(df2, aes(Day, ApprovePercet))+ggtitle("Voters")+
   theme(plot.title = element_text(hjust = 0.5))+
     geom_line(data=df2,color="red")+
     geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="pink",fill = "pink",alpha=0.8)
+    
+    
+
+Allpolls$date<-as.Date(Allpolls$date)
+df2 <- data.frame(Day=Allpolls$date,
+                    DisapprovePercet=Allpolls$disapprove_estimate,lwr=Allpolls$disapprove_lo,upr=Allpolls$disapprove_hi)
+p5 <- ggplot(df2, aes(Day, DisapprovePercet))+ggtitle("Allpolls")+ 
+  theme(plot.title = element_text(hjust = 0.5))+
+    geom_line(data=df2,color="blue")+
+    geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="cadetblue1",fill = "cadetblue1",alpha=0.7)
 
 
 Adults$date<-as.Date(Adults$date)
 df2 <- data.frame(Day=Adults$date,
                     DisapprovePercet=Adults$disapprove_estimate,lwr=Adults$disapprove_lo,upr=Adults$disapprove_hi)
 p4 <- ggplot(df2, aes(Day, DisapprovePercet))+ggtitle("Adults")+ 
-  theme(plot.title = element_text(hjust = 0.5))+
-    geom_line(data=df2,color="blue")+
-    geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="cadetblue1",fill = "cadetblue1",alpha=0.7)
-
-
-Allpolls$date<-as.Date(Allpolls$date)
-df2 <- data.frame(Day=Allpolls$date,
-                    DisapprovePercet=Allpolls$disapprove_estimate,lwr=Allpolls$disapprove_lo,upr=Allpolls$disapprove_hi)
-p5 <- ggplot(df2, aes(Day, DisapprovePercet))+ggtitle("Allpolls")+ 
   theme(plot.title = element_text(hjust = 0.5))+
     geom_line(data=df2,color="blue")+
     geom_ribbon(data=df2,aes(ymin=lwr,ymax=upr),color="cadetblue1",fill = "cadetblue1",alpha=0.7)
