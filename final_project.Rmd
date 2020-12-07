@@ -609,19 +609,17 @@ names(demo)[4] <- "others"
 #head(demo)
 ```
 ```{r}
-fit_1 <- ca(demo[demo$tablelist=="racegender",-1])
-fit_2 <- ca(demo[demo$tablelist=="party",-1])
-fit_3 <- ca(demo[demo$tablelist=="marrrygender",-1])
-fit_4 <- ca(demo[demo$tablelist=="age",-1])
-fit_5 <- ca(demo[demo$tablelist=="regiongender",-1])
-fit_6 <- ca(demo[demo$tablelist=="Education",-1])
+install.packages("FactoMineR")
+install.packages("factoextra")
+
+library("FactoMineR")
+library("factoextra")
 ```
 
 
 ### Chart 1
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_1, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE))
+```{r}
+fit_1 <- CA(demo[demo$tablelist=="racegender",-1])
 ```
 
 ***
@@ -632,9 +630,8 @@ In correspondence analysis, Dimension 1 is the dominant dimension. If Dimension 
 Above correspondence analysis is for race & gender vs supporting candidate. One can see that White people are more likely to support Trump but the other races are more likely to support Biden. Also, Womens are more likely to support Biden than men but it is less important than race factor.
 
 ### Chart 2
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_2, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE))
+```{r}
+fit_2 <- CA(demo[demo$tablelist=="party",-1])
 ```
 
 ***
@@ -642,9 +639,8 @@ plot(fit_2, mass = TRUE, contrib = "absolute", map =
 Above correspondence analysis is for supporting party vs supporting candidate. One can see that republicans are more likely to support Trump and Democratics are more likely to support Biden. Also, moderate people are less supportive for candidate in their party.
 
 ### Chart 3
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_3, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE))
+```{r}
+fit_3 <- CA(demo[demo$tablelist=="marrrygender",-1])
 ```
 
 ***
@@ -652,9 +648,8 @@ plot(fit_3, mass = TRUE, contrib = "absolute", map =
 Above correspondence analysis is for marriage & geneder vs supporting candidate. One can see that married people are more liklely to support Trump than Biden. Also, Women are more likely to support Biden than Trump. Marriage is more dominant than geneder for choosing supporting candidnate.
 
 ### Chart 4
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_4, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE))
+```{r}
+fit_4 <- CA(demo[demo$tablelist=="age",-1])
 ```
 
 ***
@@ -662,9 +657,8 @@ plot(fit_4, mass = TRUE, contrib = "absolute", map =
 Above correspondence analysis is for age vs supporting candidate. As people gets older, they are more likely to support Trump. But young people (18-29) have little bit more tendency to choose no candidates comparing the other age groups. 
 
 ### Chart 5
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_5, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE))
+```{r}
+fit_5 <- CA(demo[demo$tablelist=="regiongender",-1])
 ```
 
 ***
@@ -672,11 +666,28 @@ plot(fit_5, mass = TRUE, contrib = "absolute", map =
 Above correspondence analysis is for region & gender vs supporting candidate. One can see that people living in more urban area are more likely to support Biden. Also, Women are more likely to support Biden. Region is more dominant than geneder for choosing supporting candidnate. 
 
 ### Chart 6
-```{r, fig.height=3.7, echo=FALSE}
-plot(fit_6, mass = TRUE, contrib = "absolute", map =
-       "rowgreen", arrows = c(FALSE, TRUE), ylim=c(-0.05,0.05))
+```{r}
+fit_6 <- CA(demo[demo$tablelist=="Education",-1])
 ```
 
 ***
 
 Above correspondence analysis is for education level vs supporting candidate. One can see that as education level gets higher, people are more likely to support Biden. Especially, people with postgrad education are much more likely to support Biden.
+
+### Chart 7
+```{r}
+fit_7 <- CA(demo[demo$tablelist=="Money",-1])
+```
+
+***
+
+Above correspondence analysis is for income vs supporting candidate.
+
+### Chart 8
+```{r}
+fit_8 <- CA(demo[demo$tablelist=="religion",-1])
+```
+
+***
+
+Above correspondence analysis is for religion vs supporting candidate.
