@@ -35,7 +35,6 @@ WordClouds
 
 ```{r prepping_data_for_word_clouds}
 set.seed(63546846)
-setwd("C:\\Users\\wgeit\\Repos\\STAT_5014_team_elephant_donkey")
 # load data
 trump_df <- readRDS("trump_df_raw.RDS")
 biden_df <- readRDS("biden_df_raw.RDS")
